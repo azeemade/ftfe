@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spiritix\LadaCache\Database\LadaCacheTrait;
 
 class Address extends Model
 {
-    use HasFactory;
+    use HasFactory, LadaCacheTrait;
 
     protected $fillable = [
         'user_id',
