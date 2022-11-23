@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\Models\Profile;
+use App\Models\Address;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
-class ProfileTest extends TestCase
+class AddressTest extends TestCase
 {
     /**
      * A basic unit test example.
@@ -15,10 +15,10 @@ class ProfileTest extends TestCase
      * @return void
      */
 
-    public function test_profiles_db_has_expected_colums()
+    public function test_addresses_db_has_expected_columns()
     {
         $this->assertTrue(
-            Schema::hasColumns('profiles', [
+            Schema::hasColumns('addresses', [
                 'id',
                 'user_id',
             ]),
@@ -26,13 +26,13 @@ class ProfileTest extends TestCase
         );
     }
 
-    public function test_a_profile_belongs_to_a_user()
+    public function test_an_address_belongs_to_a_user()
     {
         $user = User::factory()->create();
-        $profile = Profile::factory()->create([
+        $address = Address::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $this->assertInstanceOf(User::class, $profile->user);
+        $this->assertInstanceOf(User::class, $address->user);
     }
 }

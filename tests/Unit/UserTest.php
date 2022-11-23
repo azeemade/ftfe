@@ -2,12 +2,13 @@
 
 namespace Tests\Unit;
 
+use App\Models\Address;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Schema;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class UserTest extends TestCase
 {
@@ -17,33 +18,23 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function test_example()
-    {
-        $this->assertTrue(true);
-    }
 
-    public function users_db_has_expected_columns()
+    public function test_users_db_has_expected_columns()
     {
         $this->assertTrue(
             Schema::hasColumns('users', [
                 'id',
-                'uuid',
                 'firstname',
                 'lastname',
                 'email',
                 'phonenumber',
-                'email_verified_at',
-                'password',
-                'remember_token',
-                'created_at',
-                'updated_at',
-                7
+                'password'
             ]),
             1
         );
     }
 
-    public function a_user_has_a_profile()
+    public function test_a_user_has_a_profile()
     {
         $user = User::factory()->create();
         $profile = Profile::factory()->create([
@@ -51,5 +42,15 @@ class UserTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Profile::class, $user->profile);
+    }
+
+    public function test_a_user_has_a_address()
+    {
+        $user = User::factory()->create();
+        $address = Address::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertInstanceOf(Address::class, $user->address);
     }
 }
