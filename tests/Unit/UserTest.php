@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Schema;
@@ -35,8 +37,19 @@ class UserTest extends TestCase
                 'remember_token',
                 'created_at',
                 'updated_at',
+                7
             ]),
             1
         );
+    }
+
+    public function a_user_has_a_profile()
+    {
+        $user = User::factory()->create();
+        $profile = Profile::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertInstanceOf(Profile::class, $user->profile);
     }
 }
