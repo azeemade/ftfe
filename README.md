@@ -1,64 +1,102 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+﻿# Setup process
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Tasks
 
-## About Laravel
+### Create a laravel application
+A simple laravel application is created with the following command
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+    composer create-project laravel/laravel ftfe
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Create 3 model with migrations called, User, Address, Profile
+Since the User model already exist with the laravel app, only the address and Profile models are generated with the following command.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+    php artisan make:model Address -mcf
+    php artisan make:model Profile -mcf
+Along with the models, migrations, controllers and factory files are generated because of the use of the **-mcf** tag. The models are populated with the mass assignment attriutes **$fillable**. 
 
-## Learning Laravel
+Address: 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+    protected  $fillable = [ 'user_id','address','street','city','state','zip',];
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Profile:
 
-## Laravel Sponsors
+    protected  $fillable = ['user_id','username','avatar','birthdate','bio','last_online'];
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+User:
 
-### Premium Partners
+    protected  $fillable = ['firstname','lastname','phonenumber','email','password',];
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Define the relation between User and Address, then User and Profile.
+ **User and Address**
+A user can have only one Address and an address can belong to one user. Considering this statement, the relationship between User and Address is a One-to-one relationship. This means the Address table will consist of a foreign key which belongs to a column in the User table. 
 
-## Contributing
+ User **hasOne** 
+ 
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    User.php
+    
+    public  function  address()
+    {
+	    return  $this->hasOne(Address::class);
+	}
 
-## Code of Conduct
+ Address **BelongsTo**
+ 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    Address.php
+    
+    public  function  user()
+    {
+	    return  $this->belongsTo(User::class);
+	}
+**User and Profile**
+The same as the explanation for Adress model.
+User **hasOne** 
+ 
 
-## Security Vulnerabilities
+    User.php
+    
+    public  function  profile()
+    {
+	    return  $this->hasOne(Profile::class);
+	}
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+ Profile **BelongsTo**
+ 
 
-## License
+    Profile.php
+    
+    public  function  user()
+    {
+	    return  $this->belongsTo(User::class);
+	}
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+### Make sure Redis is installed and configure then install this Laravel package https://github.com/spiritix/lada-cache and implement.
+After configuring redis in this laravel project using **predis**, we install the lada-cache package using the follwoing composer command.
+
+    composer require spiritix/lada-cache
+Finally the lada-cache trait is included in all our 3 models by calling
+
+    use Spiritix\LadaCache\Database\LadaCacheTrait;
+
+### Write basic tests to test that the model works. (Optional, Recommended)
+Here, PHPUnit tests are written for each model. First to check if the required columns are present in our model tables. Then we check the relationship between the models. A list of tests which were all OK are:
+
+ - test_addresses_table_has_expected_columns
+ - test_an_address_belongs_to_a_user
+ - test_profiles_tables_has_expected_columns
+ - test_a_profile_belongs_to_a_user
+ - test_user_tables_has_expected_columns
+ - test_a_user_has_a_profile
+ - test_a_user_has_an_address
+
+### Ensure https is turned on at all time and works even in the local environment.
+To turn HTTPS, **FORCE_HTTPS** is set to true in the .env file and also in the AppServiceProvider file, the following is added to the boot function.
+
+    if (App::environment('local') || App::environment('staging') || App::environment('production')) 
+    {
+	    URL::forceScheme('https');
+    }
+
+ 
